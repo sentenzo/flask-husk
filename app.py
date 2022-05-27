@@ -20,8 +20,10 @@ def ajax_get_counter():
 @app.route("/ajax/inc_counter", methods=["POST"])
 def ajax_inc_counter():
     global counter
-    diff = request.form.get('diff')
-    counter += diff or 1
+    diff = 1
+    if "diff" in request.form:
+        diff = int(request.form.get('diff'))
+    counter += diff
     return "{}"
 
 

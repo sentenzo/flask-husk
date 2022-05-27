@@ -13,8 +13,13 @@
         xhr.open(method, url, true);
 
         if (params) {
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(params));
+            let formData = new FormData(document.forms.person);
+            for (let key in params) {
+                if (params.hasOwnProperty(key)) {
+                    formData.append(key, params[key]);
+                }
+            }
+            xhr.send(formData);
         }
         else 
         {
@@ -36,26 +41,30 @@
 
 
 
-    let update_counter_hidden_value = function () {
+    let update_counter_hidden_value = function (callback) {
+        callback = callback || function() {};
         let update_counter_callback = function(response) {
             response = JSON.parse(response);
             let x = Number(response["counter"]);
             counter.hidden_value = x;
+            callback();
         };
         ajax("GET", "/ajax/get_counter", false, update_counter_callback, false);
+
     };
 
-    update_counter_hidden_value();
+    update_counter_hidden_value(() => {counter.set_number(counter.hidden_value);});
 
     btn_up.onclick = function() {
-        let x = counter.get_number();
+
+        let x = counter.hidden_value;
         counter.set_number(x+1);
         ajax("POST", "/ajax/inc_counter");
         update_counter_hidden_value();
     };
 
     btn_down.onclick = function() {
-        let x = counter.get_number();
+        let x = counter.hidden_value;
         counter.set_number(x-1);
         ajax("POST", "/ajax/inc_counter", {diff: -1});
         update_counter_hidden_value();
