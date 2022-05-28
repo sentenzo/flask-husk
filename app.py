@@ -39,7 +39,7 @@ def ajax_inc_counter():
     if "diff" in request.form:
         diff = int(request.form.get('diff'))
     counter += diff
-    return "{}"
+    return {"counter": counter}
 
 
 if __name__ == "__main__":
