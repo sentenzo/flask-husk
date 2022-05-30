@@ -3,6 +3,8 @@ from flask import Flask, render_template, request
 from time import sleep
 from random import random
 
+from db import DB
+
 DBG = True
 
 
@@ -17,7 +19,8 @@ def dbg_rand_sleep(a=0.1, b=0.8):
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-counter = 0
+
+db = DB()
 
 
 @app.route("/")
@@ -28,18 +31,17 @@ def index():
 @app.route("/ajax/get_counter", methods=["GET"])
 def ajax_get_counter():
     dbg_rand_sleep()
-    return {"counter": counter}
+    return {"counter": db.get_counter()}
 
 
 @app.route("/ajax/inc_counter", methods=["POST"])
 def ajax_inc_counter():
     dbg_rand_sleep()
-    global counter
     diff = 1
     if "diff" in request.form:
         diff = int(request.form.get('diff'))
-    counter += diff
-    return {"counter": counter}
+    db.inc_counter(diff)
+    return {"counter": db.get_counter()}
 
 
 if __name__ == "__main__":

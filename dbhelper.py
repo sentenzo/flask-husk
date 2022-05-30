@@ -18,15 +18,22 @@ def db_exists(conn, db_name):
         cursor.execute(
             "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s", (db_name,))
         exists = cursor.fetchone()
+        conn.commit()
     return exists == 1
 
 
 def create_db_if_not_exist(conn, db_name):
     if not db_exists(conn, db_name):
-        conn.rollback()
         prev_autocommit_val, conn.autocommit = conn.autocommit, True
         with conn.cursor() as cursor:
             sql_cmd = sql.SQL("CREATE DATABASE {database_name}").format(
                 database_name=sql.Identifier(db_name))
             cursor.execute(sql_cmd)
+            conn.commit()
         conn.autocommit = prev_autocommit_val
+
+
+def apply_migrations(conn):
+    with conn.cursor() as cursor:
+        cursor.execute(open("migrations/001_create_db.sql", "r").read())
+        conn.commit()
