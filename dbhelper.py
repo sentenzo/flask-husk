@@ -1,0 +1,32 @@
+import psycopg2
+from psycopg2 import sql
+from urllib.parse import urlparse
+
+
+def parse_db_url(db_url: str):
+    db_url_parsed = urlparse(db_url)
+    database = db_url_parsed.path[1:]
+    credentals, address = db_url_parsed.netloc.split("@")
+    uname, passwd = credentals.split(":")
+    host, port = address.split(":")
+    return {"dbname": database, "user": uname, "password": passwd, "host": host, "port": port}
+
+
+def db_exists(conn, db_name):
+    exists = 0
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s", (db_name,))
+        exists = cursor.fetchone()
+    return exists == 1
+
+
+def create_db_if_not_exist(conn, db_name):
+    if not db_exists(conn, db_name):
+        conn.rollback()
+        prev_autocommit_val, conn.autocommit = conn.autocommit, True
+        with conn.cursor() as cursor:
+            sql_cmd = sql.SQL("CREATE DATABASE {database_name}").format(
+                database_name=sql.Identifier(db_name))
+            cursor.execute(sql_cmd)
+        conn.autocommit = prev_autocommit_val
