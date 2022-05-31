@@ -5,7 +5,7 @@ from random import random
 
 from db import DB
 
-DBG = True
+DBG = os.environ.get("DBG", "0") == "1"
 
 
 def dbg_rand_sleep(a=0.1, b=0.8):

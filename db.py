@@ -1,6 +1,4 @@
 import psycopg2
-from psycopg2 import sql
-from urllib.parse import urlparse
 import os
 import dbhelper
 
@@ -40,6 +38,3 @@ LIMIT 1
         with self._conn.cursor() as cursor:
             cursor.execute(sql_command, (1,))
             return cursor.fetchone()
-
-
-db = DB()
