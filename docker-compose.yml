@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - 8888:10000
+    environment:
+      - DATABASE_URL=postgres://test_user:Cxtacpevz3LJYCrY994lR4ohUMNpq7s0@dpg-ce08vh6n6mpu84tdggb0-a.frankfurt-postgres.render.com/test_db_wq22
